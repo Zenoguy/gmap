@@ -84,9 +84,11 @@ All commands use full English words. No abbreviations. No cryptic flags.
 
 ---
 
-## Architecture Decisions
+## Architecture & Governance
 
-Design decisions are documented as Architecture Decision Records:
+Design decisions, standards, and workflow rules are documented here:
+
+### Architecture Decisions (ADRs)
 
 | ADR | Title |
 |---|---|
@@ -101,6 +103,13 @@ Design decisions are documented as Architecture Decision Records:
 | [0009](documentation/adr/0009-web-dashboard.md) | Web dashboard over terminal UI |
 | [0010](documentation/adr/0010-default-port.md) | Port 7842 as default API port |
 | [0011](documentation/adr/0011-cli-ergonomics.md) | CLI commands read like plain English |
+
+### Standards & Processes
+
+- 🤝 [Contributing Guidelines](CONTRIBUTING.md) — Formatting, commit rules, and monorepo guidelines.
+- 💡 [RFC Process](documentation/rfc-process.md) — How to propose database, protocol, or design changes.
+- 🛡️ [Error Philosophy](documentation/error-philosophy.md) — Structured boundaries, adapters contract, and throwing policy.
+- 📦 [API Export Guide](documentation/public-api-freeze.md) — Stable public exports vs internal namespaces.
 
 ---
 
