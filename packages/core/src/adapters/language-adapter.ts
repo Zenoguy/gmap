@@ -427,16 +427,20 @@ export class AdapterRegistry {
    * Returns null if no adapter matches — the scanner skips the file.
    */
   resolve(filePath: string): LanguageAdapter | null {
-    const ext = filePath.slice(filePath.lastIndexOf('.'));
-
     for (const adapter of this.adapters) {
-      if (adapter.extensions.includes(ext) && adapter.canHandle(filePath)) {
+      // Sort extensions by length descending so that longer specific extensions
+      // like ".d.ts" are matched before ".ts"
+      const sortedExtensions = [...adapter.extensions].sort((a, b) => b.length - a.length);
+      const matchedExt = sortedExtensions.find(ext => filePath.endsWith(ext));
+
+      if (matchedExt && adapter.canHandle(filePath)) {
         return adapter;
       }
     }
 
     return null;
   }
+
 
   /** All registered adapters — for logging and diagnostics */
   list(): LanguageAdapter[] {
