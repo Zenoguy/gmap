@@ -1,3 +1,9 @@
+// packages/core/src/db/schema.ts
+
+/**
+ * Represents a row in the `files` table.
+ * Created by migration: 001_initial.sql (Milestone 1)
+ */
 export interface FileRow {
   id: number;
   path: string;
@@ -8,6 +14,10 @@ export interface FileRow {
   has_errors: 0 | 1;
 }
 
+/**
+ * Represents a row in the `symbols` table.
+ * Created by migration: 001_initial.sql (Milestone 1)
+ */
 export interface SymbolRow {
   id: number;
   name: string;
@@ -25,6 +35,10 @@ export interface SymbolRow {
   meta: string;             // JSON string — parse with JSON.parse()
 }
 
+/**
+ * Represents a row in the `imports` table.
+ * Created by migration: 001_initial.sql (Milestone 1)
+ */
 export interface ImportRow {
   id: number;
   from_file_id: number;
@@ -37,6 +51,10 @@ export interface ImportRow {
   local_alias: string | null;
 }
 
+/**
+ * Represents a row in the `exports` table.
+ * Created by migration: 001_initial.sql (Milestone 1)
+ */
 export interface ExportRow {
   id: number;
   file_id: number;
@@ -48,6 +66,10 @@ export interface ExportRow {
   re_export_specifier: string | null;
 }
 
+/**
+ * Represents a row in the `calls` table.
+ * Created by migration: 002_calls.sql (Milestone 2)
+ */
 export interface CallRow {
   id: number;
   caller_symbol_id: number;
@@ -59,6 +81,10 @@ export interface CallRow {
   col_number: number;
 }
 
+/**
+ * Represents a row in the `scan_sessions` table.
+ * Created by migration: 003_incremental.sql (Milestone 3)
+ */
 export interface ScanSessionRow {
   id: number;
   project_root: string;
@@ -72,6 +98,10 @@ export interface ScanSessionRow {
   error_message: string | null;
 }
 
+/**
+ * Represents a row in the `executions` table.
+ * Created by migration: 004_runtime.sql (Milestone 7)
+ */
 export interface ExecutionRow {
   id: number;
   symbol_id: number;
@@ -84,6 +114,10 @@ export interface ExecutionRow {
   last_seen: number;
 }
 
+/**
+ * Represents a row in the `routes` table.
+ * Created by migration: 005_routes.sql (Milestone 2)
+ */
 export interface RouteRow {
   id: number;
   symbol_id: number;
@@ -92,3 +126,4 @@ export interface RouteRow {
   file_id: number;
   line_number: number;
 }
+
