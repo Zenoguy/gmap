@@ -1,0 +1,30 @@
+{
+  "name":    "@gmap/core",
+  "version": "0.1.0",
+  "private": true,
+  "type":    "module",
+  "main":    "./dist/index.js",
+  "types":   "./dist/index.d.ts",
+  "exports": {
+    ".":           { "import": "./dist/index.js",          "types": "./dist/index.d.ts" },
+    "./adapters":  { "import": "./dist/adapters/index.js", "types": "./dist/adapters/index.d.ts" },
+    "./db":        { "import": "./dist/db/index.js",       "types": "./dist/db/index.d.ts" },
+    "./types":     { "import": "./dist/types/index.js",    "types": "./dist/types/index.d.ts" }
+  },
+  "scripts": {
+    "build":     "tsc --build",
+    "typecheck": "tsc --build",
+    "test":      "vitest run",
+    "lint":      "eslint src",
+    "clean":     "rm -rf dist *.tsbuildinfo"
+  },
+  "dependencies": {
+    "better-sqlite3": "12.11.1",
+    "ts-morph":       "23.0.0",
+    "ignore":         "5.3.2"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "7.6.11",
+    "@types/node":           "20.16.5"
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "name":           "gmap",
+  "displayName":    "gmap — codebase graph mapper",
+  "description":    "Understand what your code touches. Callers, callees, and blast radius inline.",
+  "version":        "0.1.0",
+  "publisher":      "gmap",
+  "private":        true,
+  "engines":        { "vscode": "^1.85.0" },
+  "categories":     ["Other", "Programming Languages"],
+  "activationEvents": [
+    "workspaceContains:gmap.config.json",
+    "workspaceContains:.gmap/db.sqlite",
+    "onCommand:gmap.scan"
+  ],
+  "main":           "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      { "command": "gmap.scan",          "title": "gmap: Scan workspace" },
+      { "command": "gmap.showImpact",    "title": "gmap: Show impact" },
+      { "command": "gmap.traceFunction", "title": "gmap: Trace function" },
+      { "command": "gmap.whyCalled",     "title": "gmap: Why is this called" }
+    ],
+    "views": {
+      "explorer": [
+        { "id": "gmap.symbols", "name": "gmap symbols" }
+      ]
+    }
+  },
+  "scripts": {
+    "build":     "esbuild src/extension.ts --bundle --outdir=dist --external:vscode --platform=node --format=cjs",
+    "typecheck": "tsc --noEmit",
+    "test":      "vitest run",
+    "lint":      "eslint src",
+    "clean":     "rm -rf dist"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/vscode":  "1.85.0",
+    "@types/node":    "20.16.5",
+    "esbuild":        "0.23.1"
+  }
+}

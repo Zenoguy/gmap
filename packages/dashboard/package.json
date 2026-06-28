@@ -1,0 +1,29 @@
+{
+  "name":    "@gmap/dashboard",
+  "version": "0.1.0",
+  "private": true,
+  "type":    "module",
+  "scripts": {
+    "build":     "vite build",
+    "typecheck": "tsc --build",
+    "dev":       "vite",
+    "test":      "vitest run",
+    "lint":      "eslint src",
+    "clean":     "rm -rf dist"
+  },
+  "dependencies": {
+    "react":        "18.3.1",
+    "react-dom":    "18.3.1",
+    "cytoscape":    "3.30.2",
+    "zustand":      "4.5.5"
+  },
+  "devDependencies": {
+    "@types/react":          "18.3.5",
+    "@types/react-dom":      "18.3.0",
+    "@types/cytoscape":      "3.21.7",
+    "@vitejs/plugin-react":  "4.3.1",
+    "vite":                  "5.4.3",
+    "@vitest/ui":            "2.1.1",
+    "happy-dom":             "15.7.4"
+  }
+}
