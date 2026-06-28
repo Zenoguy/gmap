@@ -134,45 +134,72 @@ packages/
 
 ### Database schema (M1 tables)
 
+The schema in M1 is managed by the migrations runner using `001_initial.sql`. The structure matches:
+
 ```sql
 CREATE TABLE files (
-  id INTEGER PRIMARY KEY,
-  path TEXT NOT NULL UNIQUE,
-  relative_path TEXT NOT NULL,
-  last_scanned INTEGER NOT NULL
+  id             INTEGER PRIMARY KEY,
+  path           TEXT    NOT NULL UNIQUE,   -- absolute path
+  relative_path  TEXT    NOT NULL,          -- relative to scan root
+  language       TEXT    NOT NULL,          -- 'typescript' | 'python' | etc.
+  content_hash   TEXT    NOT NULL DEFAULT '', -- SHA-256 hex hash
+  last_scanned   INTEGER NOT NULL DEFAULT 0,  -- unix ms of last scan
+  has_errors     INTEGER NOT NULL DEFAULT 0   -- 1 if last parse had errors
 );
 
 CREATE TABLE symbols (
-  id INTEGER PRIMARY KEY,
-  name TEXT NOT NULL,
-  type TEXT NOT NULL CHECK(type IN ('function','class','interface','type','variable')),
-  file_id INTEGER NOT NULL REFERENCES files(id),
-  line_start INTEGER NOT NULL,
-  line_end INTEGER NOT NULL,
-  is_exported INTEGER NOT NULL DEFAULT 0
+  id               INTEGER PRIMARY KEY,
+  name             TEXT    NOT NULL,    -- unqualified: "approveEstimate"
+  qualified_name   TEXT    NOT NULL,    -- with class/ns: "ApprovalService.approveEstimate"
+  kind             TEXT    NOT NULL
+    CHECK(kind IN (
+      'function','method','class','interface',
+      'type','variable','enum','namespace','route','model'
+    )),
+  file_id          INTEGER NOT NULL REFERENCES files(id) ON DELETE CASCADE,
+  line_start       INTEGER NOT NULL,
+  line_end         INTEGER NOT NULL,
+  col_start        INTEGER NOT NULL DEFAULT 0,
+  col_end          INTEGER NOT NULL DEFAULT 0,
+  is_exported      INTEGER NOT NULL DEFAULT 0,
+  is_default_export INTEGER NOT NULL DEFAULT 0,
+  parent_name      TEXT,               -- class/ns name for methods
+  parameters       TEXT    NOT NULL DEFAULT '[]', -- JSON array of param names
+  meta             TEXT    NOT NULL DEFAULT '{}'  -- JSON, adapter-specific
 );
 
 CREATE TABLE imports (
-  id INTEGER PRIMARY KEY,
-  from_file_id INTEGER NOT NULL REFERENCES files(id),
-  to_file_id INTEGER REFERENCES files(id),     -- null if external package
-  specifier TEXT NOT NULL,                      -- raw import string
-  resolved_path TEXT,                           -- resolved absolute path
-  imported_names TEXT NOT NULL                  -- JSON array of imported names
+  id              INTEGER PRIMARY KEY,
+  from_file_id    INTEGER NOT NULL REFERENCES files(id) ON DELETE CASCADE,
+  to_file_id      INTEGER REFERENCES files(id) ON DELETE SET NULL, -- null = external
+  specifier       TEXT    NOT NULL,   -- raw: "@/utils", "./services/foo", "express"
+  resolved_path   TEXT,               -- absolute path, null if external/unresolved
+  is_external     INTEGER NOT NULL DEFAULT 0,
+  kind            TEXT    NOT NULL
+    CHECK(kind IN ('named','default','namespace','side-effect','dynamic','require')),
+  imported_names  TEXT    NOT NULL DEFAULT '[]', -- JSON array
+  local_alias     TEXT                           -- if renamed
 );
 
 CREATE TABLE exports (
-  id INTEGER PRIMARY KEY,
-  file_id INTEGER NOT NULL REFERENCES files(id),
-  symbol_id INTEGER REFERENCES symbols(id),
-  exported_name TEXT NOT NULL,
-  is_re_export INTEGER NOT NULL DEFAULT 0
+  id                  INTEGER PRIMARY KEY,
+  file_id             INTEGER NOT NULL REFERENCES files(id) ON DELETE CASCADE,
+  symbol_id           INTEGER REFERENCES symbols(id) ON DELETE SET NULL,
+  exported_name       TEXT    NOT NULL,
+  local_name          TEXT,               -- internal name if different
+  is_default          INTEGER NOT NULL DEFAULT 0,
+  is_re_export        INTEGER NOT NULL DEFAULT 0,
+  re_export_specifier TEXT                -- source specifier for re-exports
 );
 
-CREATE INDEX idx_symbols_name ON symbols(name);
-CREATE INDEX idx_symbols_file ON symbols(file_id);
-CREATE INDEX idx_imports_from ON imports(from_file_id);
-CREATE INDEX idx_imports_to ON imports(to_file_id);
+CREATE INDEX idx_files_path          ON files(path);
+CREATE INDEX idx_files_content_hash  ON files(content_hash);
+CREATE INDEX idx_symbols_name        ON symbols(name);
+CREATE INDEX idx_symbols_qualified   ON symbols(qualified_name);
+CREATE INDEX idx_symbols_file        ON symbols(file_id);
+CREATE INDEX idx_imports_from_file   ON imports(from_file_id);
+CREATE INDEX idx_imports_to_file     ON imports(to_file_id);
+CREATE INDEX idx_exports_file        ON exports(file_id);
 ```
 
 ### Acceptance criteria
