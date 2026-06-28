@@ -3,13 +3,18 @@ import path from 'node:path';
 import os from 'node:os';
 import fs from 'node:fs';
 import { runMigrations } from './migrator.js';
+import { type Logger, silentLogger } from '../utils/logger.js';
 
 const DEFAULT_DB_PATH = path.join(os.homedir(), '.gmap', 'db.sqlite');
 
-export function openDatabase(dbPath = DEFAULT_DB_PATH): Database.Database {
+export function openDatabase(
+  dbPath = DEFAULT_DB_PATH,
+  logger: Logger = silentLogger
+): Database.Database {
   // Ensure ~/.gmap/ exists
   fs.mkdirSync(path.dirname(dbPath), { recursive: true });
 
+  const exists = fs.existsSync(dbPath);
   const db = new Database(dbPath);
 
   // Performance pragmas — set before any queries
@@ -20,10 +25,14 @@ export function openDatabase(dbPath = DEFAULT_DB_PATH): Database.Database {
   db.pragma('temp_store = MEMORY');  // temp tables in RAM
 
   // Set file permissions to owner-only (0600) on first create
-  fs.chmodSync(dbPath, 0o600);
+  if (!exists) {
+    fs.chmodSync(dbPath, 0o600);
+  }
 
   // Run any pending migrations
-  runMigrations(db);
+  runMigrations(db, logger);
 
   return db;
 }
+
+
